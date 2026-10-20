@@ -4,42 +4,6 @@ Sistema completo de gerenciamento financeiro pessoal com suporte a múltiplos us
 
 > 📁 **Versão de portfólio.** Este repositório é uma cópia pública do projeto, que é desenvolvido em um repositório privado. Arquivos de produção (secrets selados, domínios e configurações de infraestrutura real) foram removidos ou substituídos por exemplos.
 
-<p align="center">
-  <a href="https://github.com/dudullsc/controle-contas-showcase">
-    <img src="./profile/repo-pin.svg" alt="controle_contas" />
-  </a>
-</p>
-
-<p align="center">
-  <a href="https://github.com/dudullsc/controle-contas-showcase">
-    <img src="./profile/repo-badges.svg" alt="Badges do repositório" />
-  </a>
-</p>
-
-<p align="center">
-  <a href="https://github.com/dudullsc/controle-contas-showcase">
-    <img src="./profile/repo-stats.svg" alt="Estatísticas do repositório controle_contas" />
-  </a>
-</p>
-
-<p align="center">
-  <a href="https://github.com/dudullsc/controle-contas-showcase/graphs/contributors">
-    <img src="./profile/contributor-rank.svg" alt="Ranking de contribuidores" />
-  </a>
-</p>
-
-<p align="center">
-  <a href="https://github.com/dudullsc/controle-contas-showcase/commits">Commits</a>
-  ·
-  <a href="https://github.com/dudullsc/controle-contas-showcase/pulls">PRs</a>
-  ·
-  <a href="https://github.com/dudullsc/controle-contas-showcase/issues">Issues</a>
-  ·
-  <a href="https://github.com/dudullsc/controle-contas-showcase/graphs/contributors">Contribuidores</a>
-  ·
-  <a href="https://github.com/dudullsc/controle-contas-showcase/pulse">Atividade</a>
-</p>
-
 ## 📋 Índice
 
 - [Sobre o Projeto](#-sobre-o-projeto)
@@ -241,7 +205,7 @@ Regras principais das rotas de usuários:
 ## 📁 Estrutura do Projeto
 
 ```
-controle_contas/
+controle-contas-showcase/
 ├── app/
 │   ├── backend/                      # API FastAPI
 │   │   ├── config.py                 # Configurações e variáveis de ambiente
@@ -798,7 +762,7 @@ Prefixo padrão: `/api`
 
 ## 📄 Licença
 
-Este projeto é privado e de uso pessoal.
+Projeto pessoal publicado como portfólio. Todos os direitos reservados.
 
 ---
 
