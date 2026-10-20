@@ -2,8 +2,6 @@
 
 Sistema completo de gerenciamento financeiro pessoal com suporte a múltiplos usuários, controle de despesas, relatórios analíticos e previsões financeiras.
 
-> 📁 **Versão de portfólio.** Este repositório é uma cópia pública do projeto, que é desenvolvido em um repositório privado. Arquivos de produção (secrets selados, domínios e configurações de infraestrutura real) foram removidos ou substituídos por exemplos.
-
 ## 📋 Índice
 
 - [Sobre o Projeto](#-sobre-o-projeto)
