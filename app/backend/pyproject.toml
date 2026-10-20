@@ -1,0 +1,52 @@
+[tool.pyright]
+include = ["."]
+exclude = ["**/__pycache__", "**/venv", "**/.venv", "**/node_modules", "**/.*"]
+reportMissingImports = false
+reportMissingTypeStubs = false
+pythonVersion = "3.11"
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+
+[tool.ruff]
+line-length = 88
+target-version = "py311"
+extend-exclude = ["venv", ".venv", "__pycache__"]
+
+[tool.ruff.lint]
+# Habilita regras de linting
+select = [
+    "E",    # pycodestyle errors
+    "W",    # pycodestyle warnings
+    "F",    # pyflakes
+    "I",    # isort
+    "B",    # flake8-bugbear
+    "C4",   # flake8-comprehensions
+    "UP",   # pyupgrade
+]
+ignore = [
+    "E501", # line too long (já coberto por line-length)
+    "B008", # function call in argument defaults (necessário para FastAPI Depends)
+    "B904", # raise from dentro de except (padrão do projeto para HTTPException)
+    "UP042", # class(str, Enum) vs StrEnum (mantém compatibilidade)
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["app", "backend"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "lf"
+
+[tool.pylint.MESSAGES_CONTROL]
+disable = ["import-error", "no-name-in-module"]
+
+[tool.pylint.MASTER]
+ignore = ["venv", "__pycache__", ".venv"]
+
+[tool.pylint.TYPECHECK]
+ignored-modules = ["fastapi", "uvicorn", "starlette", "pydantic", "motor", "bson"]
+

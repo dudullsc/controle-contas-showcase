@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="120" viewBox="0 0 400 120">
+  <style>
+    .title { font: 700 16px 'Segoe UI', Ubuntu, sans-serif; fill: #58a6ff; }
+    .desc { font: 400 12px 'Segoe UI', Ubuntu, sans-serif; fill: #8b949e; }
+    .meta { font: 500 12px 'Segoe UI', Ubuntu, sans-serif; fill: #c9d1d9; }
+  </style>
+  <rect width="400" height="120" rx="12" fill="#0d1117" stroke="#30363d"/>
+  <text x="20" y="36" class="title">dudullsc/controle_contas</text>
+  <text x="20" y="60" class="desc">Repositório privado</text>
+  <circle cx="28" cy="92" r="5" fill="#3178c6"/>
+  <text x="40" y="96" class="meta">TypeScript</text>
+  <text x="140" y="96" class="meta">★ 0</text>
+  <text x="210" y="96" class="meta">⑂ 0</text>
+  <text x="280" y="96" class="meta">private</text>
+</svg>

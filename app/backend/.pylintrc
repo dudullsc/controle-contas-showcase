@@ -1,0 +1,12 @@
+[MESSAGES CONTROL]
+# Desabilitar avisos de imports não resolvidos
+disable=import-error,no-name-in-module
+
+[MASTER]
+# Ignorar diretórios
+ignore=venv,__pycache__,.venv
+
+[TYPECHECK]
+# Ignorar imports não resolvidos
+ignored-modules=fastapi,uvicorn,starlette,pydantic,motor,bson
+

@@ -1,0 +1,105 @@
+# .gitignore global para todo o projeto controle_contas
+
+# Diretórios e arquivos comuns
+.env*
+*.env
+*.env.*
+*.log
+*.tmp
+*.bak
+*.swp
+*.swo
+*.orig
+*.rej
+*.sublime-workspace
+*.sublime-project
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+.mypy_cache/
+.pytest_cache/
+.tox/
+*.egg-info/
+*.db
+*.sqlite3
+*.sqlite
+*.pkl
+
+# Node/Next.js
+node_modules/
+.next/
+dist/
+build/
+coverage/
+yarn.lock
+pnpm-lock.yaml
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# VSCode
+.vscode/
+
+# Sistema
+.DS_Store
+Thumbs.db
+
+# Outros
+*.tgz
+*.zip
+*.tar.gz
+
+# Evitar arquivos de configuração locais
+*.local
+
+# Mobile (Capacitor)
+mobile/node_modules/
+mobile/android/.gradle/
+mobile/android/app/build/
+mobile/android/build/
+mobile/android/local.properties
+mobile/android/captures/
+mobile/android/*.apk
+mobile/android/*.aab
+mobile/*.apk
+mobile/*.aab
+mobile/android/keystore/
+mobile/android/keystore.properties
+mobile/**/*.jks
+mobile/**/*.keystore
+mobile/ios/App/Pods/
+mobile/ios/App/build/
+mobile/ios/DerivedData/
+
+# Secrets em claro (nunca versionar — use sealedsecret.yaml)
+**/secret.yaml
+!**/*secret.yaml.example
+**/fcm-secret.yaml
+**/fcm-secret.json
+
+# Firebase / FCM (nunca versionar)
+**/firebase-service-account.json
+**/serviceAccountKey.json
+**/*-firebase-adminsdk-*.json
+app/backend/secrets/
+!app/backend/secrets/.gitkeep
+!app/backend/secrets/README.md
+mobile/android/app/google-services.json
+
+# Scripts de inicialização
+start-backend.ps1
+start-frontend.ps1
+INICIO_RAPIDO.md
+config.py
+
+mobile/.idea/
+mobile/android/.idea/
+
+# Clone upstream do skill (cópia usada pelo Cursor fica em .cursor/skills/security-audit)
+/security-audit-skill/
+

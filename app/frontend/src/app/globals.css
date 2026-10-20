@@ -1,0 +1,346 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+body {
+  color: #1f2937;
+  background: #f9fafb;
+}
+
+input,
+textarea,
+select {
+  background-color: white !important;
+  color: #1f2937 !important;
+}
+
+input::-moz-placeholder,
+textarea::-moz-placeholder {
+  color: #9ca3af !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #9ca3af !important;
+}
+
+/* Glassmorphism Effects */
+@layer components {
+  .glass-effect {
+    @apply backdrop-blur-md bg-white/40 border border-white/20;
+  }
+
+  .glass-effect-dark {
+    @apply backdrop-blur-md bg-gray-900/40 border border-white/10;
+  }
+
+  /* Smooth transitions para elementos de despesa */
+  .expense-row-paid {
+    @apply opacity-75 line-through transition-all duration-500;
+  }
+
+  /* Animação de strikethrough suave */
+  @keyframes slideLineThrough {
+    from {
+      text-decoration-color: transparent;
+    }
+    to {
+      text-decoration-color: currentColor;
+    }
+  }
+
+  .expense-strikethrough {
+    animation: slideLineThrough 0.6s ease-out forwards;
+  }
+
+  /* Animação de pulse no checkbox */
+  @keyframes checkPulse {
+    0%, 100% {
+      box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+    }
+    50% {
+      box-shadow: 0 0 0 10px rgba(16, 185, 129, 0);
+    }
+  }
+
+  .check-pulse {
+    animation: checkPulse 1s ease-out forwards;
+  }
+
+  /* Efeito de entrada suave */
+  @keyframes slideInUp {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .expense-table tbody tr {
+    animation: slideInUp 0.4s ease-out forwards;
+  }
+
+  /* Gradient backgrounds responsivos */
+  .gradient-primary {
+    @apply bg-gradient-to-br from-blue-500 via-blue-600 to-blue-700;
+  }
+
+  .gradient-success {
+    @apply bg-gradient-to-br from-green-500 via-green-600 to-green-700;
+  }
+
+  .gradient-warning {
+    @apply bg-gradient-to-br from-yellow-500 via-orange-500 to-orange-600;
+  }
+
+  .card-hover {
+    @apply transition-all duration-300 hover:shadow-2xl hover:scale-[1.01];
+  }
+}
+
+/* Suporte para Dark Mode (preparado) */
+@media (prefers-color-scheme: dark) {
+  .glass-effect {
+    @apply backdrop-blur-md bg-gray-800/40 border border-gray-700/30;
+  }
+
+  .expense-row {
+    @apply hover:bg-gray-700/30;
+  }
+}
+
+/* Scrollbar customizado */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-gray-100 rounded-lg;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-gray-300 rounded-lg hover:bg-gray-400;
+}
+
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+body {
+  color: #1f2937;
+  background: #f9fafb;
+}
+
+input,
+textarea,
+select {
+  background-color: white !important;
+  color: #1f2937 !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #9ca3af !important;
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* Auth pages — Light Trust motion */
+@keyframes auth-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes auth-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.auth-fade-in {
+  animation: auth-fade-in 0.7s ease-out both;
+}
+
+.auth-slide-up {
+  animation: auth-slide-up 0.65s ease-out 0.15s both;
+}
+
+/* Análise de comprovante (IA) */
+@keyframes receipt-analyze-overlay-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes receipt-analyze-overlay-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes receipt-analyze-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes receipt-analyze-card-out {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.94) translateY(8px);
+  }
+}
+
+@keyframes receipt-analyze-bar {
+  0% {
+    transform: translateX(-120%);
+  }
+  100% {
+    transform: translateX(280%);
+  }
+}
+
+@keyframes receipt-analyze-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scale(1.18);
+    opacity: 0.25;
+  }
+}
+
+@keyframes receipt-analyze-sparkle {
+  0%,
+  100% {
+    opacity: 0.4;
+    transform: scale(0.85) rotate(0deg);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.15) rotate(12deg);
+  }
+}
+
+@keyframes receipt-analyze-scan {
+  0% {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.7;
+  }
+  80% {
+    opacity: 0.7;
+  }
+  100% {
+    transform: translateY(120%);
+    opacity: 0;
+  }
+}
+
+@keyframes receipt-modal-enter {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.receipt-analyze-overlay-enter {
+  animation: receipt-analyze-overlay-in 0.25s ease-out both;
+}
+
+.receipt-analyze-overlay-exit {
+  animation: receipt-analyze-overlay-out 0.65s ease-in both;
+}
+
+.receipt-analyze-card-enter {
+  animation: receipt-analyze-card-in 0.35s ease-out both;
+}
+
+.receipt-analyze-card-exit {
+  animation: receipt-analyze-card-out 0.7s ease-in both;
+}
+
+.receipt-analyze-bar {
+  animation: receipt-analyze-bar 1.35s ease-in-out infinite;
+}
+
+.receipt-analyze-pulse {
+  animation: receipt-analyze-pulse 1.6s ease-in-out infinite;
+}
+
+.receipt-analyze-sparkle {
+  animation: receipt-analyze-sparkle 1.4s ease-in-out infinite;
+}
+
+.receipt-analyze-scan {
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(13, 148, 136, 0.12) 40%,
+    rgba(13, 148, 136, 0.35) 50%,
+    rgba(13, 148, 136, 0.12) 60%,
+    transparent 100%
+  );
+  animation: receipt-analyze-scan 1.8s ease-in-out infinite;
+}
+
+.receipt-modal-enter {
+  animation: receipt-modal-enter 0.35s ease-out both;
+}
+

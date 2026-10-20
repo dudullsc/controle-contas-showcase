@@ -1,0 +1,9 @@
+node_modules
+.next
+.env
+.env*
+secrets/
+*.pem
+*firebase-adminsdk*.json
+firebase-service-account.json
+google-services.json

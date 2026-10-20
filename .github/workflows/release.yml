@@ -1,0 +1,256 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "front-v*"
+      - "back-v*"
+
+permissions:
+  contents: write
+  packages: write
+
+env:
+  REGISTRY: ghcr.io
+  BACK_IMAGE: ghcr.io/${{ github.repository_owner }}/controle-contas-back
+  FRONT_IMAGE: ghcr.io/${{ github.repository_owner }}/controle-contas-front
+
+jobs:
+  meta:
+    runs-on: ubuntu-latest
+    outputs:
+      component: ${{ steps.meta.outputs.component }}
+      version: ${{ steps.meta.outputs.version }}
+      image_tag: ${{ steps.meta.outputs.image_tag }}
+      prerelease: ${{ steps.meta.outputs.prerelease }}
+      channel: ${{ steps.meta.outputs.channel }}
+    steps:
+      - name: Release metadata
+        id: meta
+        run: |
+          REF="${GITHUB_REF_NAME}"
+          if [[ "$REF" == front-v* ]]; then
+            COMPONENT="front"
+            VERSION="${REF#front-v}"
+          elif [[ "$REF" == back-v* ]]; then
+            COMPONENT="back"
+            VERSION="${REF#back-v}"
+          else
+            echo "Unsupported tag: $REF" >&2
+            exit 1
+          fi
+
+          IMAGE_TAG="v${VERSION}"
+          echo "component=${COMPONENT}" >> "$GITHUB_OUTPUT"
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "image_tag=${IMAGE_TAG}" >> "$GITHUB_OUTPUT"
+
+          if [[ "$VERSION" =~ -(alpha|beta|rc)([.-]|$) ]]; then
+            echo "prerelease=true" >> "$GITHUB_OUTPUT"
+            echo "channel=${BASH_REMATCH[1]}" >> "$GITHUB_OUTPUT"
+          else
+            echo "prerelease=false" >> "$GITHUB_OUTPUT"
+            echo "channel=stable" >> "$GITHUB_OUTPUT"
+          fi
+
+  github-release:
+    runs-on: ubuntu-latest
+    needs: meta
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          COMPONENT: ${{ needs.meta.outputs.component }}
+          VERSION: ${{ needs.meta.outputs.version }}
+          CHANNEL: ${{ needs.meta.outputs.channel }}
+          PRERELEASE: ${{ needs.meta.outputs.prerelease }}
+        run: |
+          if [[ "$COMPONENT" == "front" ]]; then
+            TITLE="Frontend v${VERSION}"
+          else
+            TITLE="Backend v${VERSION}"
+          fi
+          FLAGS=(--generate-notes --verify-tag)
+          if [[ "$PRERELEASE" == "true" ]]; then
+            TITLE="${TITLE} (${CHANNEL})"
+            FLAGS+=(--prerelease)
+          fi
+          gh release create "$GITHUB_REF_NAME" \
+            --title "$TITLE" \
+            "${FLAGS[@]}"
+
+  build-backend:
+    runs-on: ubuntu-latest
+    needs: [meta, github-release]
+    if: needs.meta.outputs.component == 'back'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Docker tags
+        id: tags
+        env:
+          IMAGE: ${{ env.BACK_IMAGE }}
+          IMAGE_TAG: ${{ needs.meta.outputs.image_tag }}
+          CHANNEL: ${{ needs.meta.outputs.channel }}
+          PRERELEASE: ${{ needs.meta.outputs.prerelease }}
+        run: |
+          {
+            echo "tags<<EOF"
+            echo "${IMAGE}:${IMAGE_TAG}"
+            echo "${IMAGE}:${GITHUB_SHA}"
+            if [[ "$PRERELEASE" == "true" ]]; then
+              echo "${IMAGE}:${CHANNEL}"
+            else
+              echo "${IMAGE}:latest"
+            fi
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Build and push backend
+        uses: docker/build-push-action@v6
+        with:
+          context: app/backend
+          file: app/backend/Dockerfile
+          push: true
+          tags: ${{ steps.tags.outputs.tags }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  build-frontend:
+    runs-on: ubuntu-latest
+    needs: [meta, github-release]
+    if: needs.meta.outputs.component == 'front'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Docker tags
+        id: tags
+        env:
+          IMAGE: ${{ env.FRONT_IMAGE }}
+          IMAGE_TAG: ${{ needs.meta.outputs.image_tag }}
+          CHANNEL: ${{ needs.meta.outputs.channel }}
+          PRERELEASE: ${{ needs.meta.outputs.prerelease }}
+        run: |
+          {
+            echo "tags<<EOF"
+            echo "${IMAGE}:${IMAGE_TAG}"
+            echo "${IMAGE}:${GITHUB_SHA}"
+            if [[ "$PRERELEASE" == "true" ]]; then
+              echo "${IMAGE}:${CHANNEL}"
+            else
+              echo "${IMAGE}:latest"
+            fi
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Build and push frontend
+        uses: docker/build-push-action@v6
+        with:
+          context: app/frontend
+          file: app/frontend/Dockerfile
+          push: true
+          build-args: |
+            NEXT_PUBLIC_API_URL=https://contas.example.com/cc-api
+            NEXT_PUBLIC_APP_VERSION=${{ needs.meta.outputs.version }}
+            NEXT_PUBLIC_APP_BUILD=${{ github.sha }}
+          tags: ${{ steps.tags.outputs.tags }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  pin-image:
+    runs-on: ubuntu-latest
+    needs: [meta, build-frontend, build-backend]
+    if: |
+      always() &&
+      needs.meta.outputs.prerelease == 'false' &&
+      (
+        (needs.meta.outputs.component == 'front' && needs.build-frontend.result == 'success') ||
+        (needs.meta.outputs.component == 'back' && needs.build-backend.result == 'success')
+      )
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Pin component image in k8s overlay
+        env:
+          COMPONENT: ${{ needs.meta.outputs.component }}
+          FRONT_IMAGE: ${{ env.FRONT_IMAGE }}
+          BACK_IMAGE: ${{ env.BACK_IMAGE }}
+          IMAGE_TAG: ${{ needs.meta.outputs.image_tag }}
+        run: |
+          python3 - <<'PY'
+          import os, pathlib, re
+
+          component = os.environ["COMPONENT"]
+          image_tag = os.environ["IMAGE_TAG"]
+
+          if component == "front":
+              file_path = "k8s/apps/controle-contas/front/overlays/prd/deployment.yaml"
+              name = "controle-contas-front"
+              target = f"{os.environ['FRONT_IMAGE']}:{image_tag}"
+          else:
+              file_path = "k8s/apps/controle-contas/back/overlays/prd/deployment.yaml"
+              name = "controle-contas-back"
+              target = f"{os.environ['BACK_IMAGE']}:{image_tag}"
+
+          path = pathlib.Path(file_path)
+          text = path.read_text(encoding="utf-8")
+          updated, n = re.subn(
+              rf"(value:\s*)ghcr\.io/[^\s]+/{name}:\S+",
+              rf"\g<1>{target}",
+              text,
+              count=1,
+          )
+          if n != 1:
+              raise SystemExit(f"Expected 1 image pin replacement in {path}, got {n}")
+          path.write_text(updated, encoding="utf-8")
+          print(f"Pinned {name} image to {target}")
+          PY
+
+      - name: Commit and push pin
+        env:
+          COMPONENT: ${{ needs.meta.outputs.component }}
+          IMAGE_TAG: ${{ needs.meta.outputs.image_tag }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          if [[ "$COMPONENT" == "front" ]]; then
+            FILE="k8s/apps/controle-contas/front/overlays/prd/deployment.yaml"
+          else
+            FILE="k8s/apps/controle-contas/back/overlays/prd/deployment.yaml"
+          fi
+
+          git add "$FILE"
+          if git diff --cached --quiet; then
+            echo "Image pin already up to date."
+            exit 0
+          fi
+          git commit -m "chore(k8s): pin ${COMPONENT} to ${IMAGE_TAG}"
+          git push origin HEAD:main

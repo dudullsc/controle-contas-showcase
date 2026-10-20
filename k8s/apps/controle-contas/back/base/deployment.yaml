@@ -1,0 +1,106 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: controle-contas-back
+  namespace: controle-contas
+  labels:
+    app: controle-contas-back
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: controle-contas-back
+  template:
+    metadata:
+      labels:
+        app: controle-contas-back
+    spec:
+      priorityClassName: pc-6-apps-priority
+      imagePullSecrets:
+        - name: ghcr-pull-secret
+      containers:
+        - name: controle-contas-back
+          image: placeholder
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 8000
+              protocol: TCP
+          env:
+            - name: DATABASE_NAME
+              value: controle_contas
+            - name: FRONTEND_URL
+              value: https://contas.example.com
+            - name: ALLOWED_ORIGINS
+              value: https://contas.example.com
+            - name: WAHA_BASE_URL
+              value: http://waha:3000
+            - name: WAHA_SESSION
+              value: default
+            - name: ENABLE_NOTIFICATIONS
+              value: "true"
+            - name: ENABLE_BACKUPS
+              value: "true"
+            - name: BACKUP_CRON_TIME
+              value: "03:00"
+            - name: GOOGLE_REDIRECT_URI
+              value: https://contas.example.com/dashboard/settings
+            - name: GOOGLE_DRIVE_BACKUP_FOLDER
+              value: ControleContas/Backups
+            - name: APP_VERSION
+              value: "1.0.17"
+            - name: S3_ENDPOINT
+              value: http://minio.minio.svc.cluster.local:9000
+            - name: S3_BUCKET
+              value: controle-contas-receipts
+            - name: S3_USE_SSL
+              value: "false"
+            - name: S3_REGION
+              value: us-east-1
+            - name: S3_MAX_RECEIPT_BYTES
+              value: "5242880"
+            - name: GEMINI_MODEL
+              value: gemini-flash-latest
+            - name: GEMINI_FALLBACK_MODELS
+              value: gemini-3.1-flash-lite,gemini-flash-lite-latest,gemini-3-flash-preview,gemini-3.6-flash
+          envFrom:
+            - secretRef:
+                name: controle-contas-db-credentials
+            - secretRef:
+                name: controle-contas-app-config
+            - secretRef:
+                name: waha-credentials
+            - secretRef:
+                name: controle-contas-fcm
+            - secretRef:
+                name: controle-contas-google-drive
+            - secretRef:
+                name: controle-contas-minio
+            - secretRef:
+                name: controle-contas-gemini
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 6
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 20
+            timeoutSeconds: 5
+            failureThreshold: 6
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              memory: 512Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false
+            runAsNonRoot: false
